@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scoreboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<body>
+
+<button onclick="setScore()">Boutton 1</button>
+
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label for="userScore">Your Score !</label>
+            <input type="text" class="form-control" id="userScore" placeholder="">
+        </div>
+        <div class="form-group">
+            <label for="userName">Your name</label>
+            <input type="text" class="form-control" id="userName" placeholder="Enter a name">
+        </div>
+        <button  onclick="setScore(document.getElementById('userName').value)" class="btn btn-primary">Envoyer</button>
+    </form>
+</div>
+
+<br>
+<br>
+<br>
+
+<div class="container">
+    <table id="app" class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">User</th>
+            <th scope="col">Score</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="data in jsonData">
+            <th scope="row">{{ jsonData.indexOf(data) + 1 }}</th>
+            <td>{{ data.user }}</td>
+            <td>{{ data.score }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    var randomScore = "";
+    window.onload = function setRandomScore() {
+        randomScore = Math.floor(Math.random() * 100) + 1;
+        document.getElementById("userScore").placeholder = randomScore;
+    }
+
+    console.log()
+
+    const scoreboard = [];
+    async function myFunction() {
+        const response = await fetch('http://localhost:8080/');
+        const myJson = await response.json(); //extract JSON from the http response
+        console.log(myJson);
+    }
+
+    function setScore(name) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", 'http://localhost:8080', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            user: name,
+            score: randomScore.toString()
+        }));
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            jsonData: []
+        },
+        mounted () {
+            this.loadJsonData();
+        },
+        methods: {
+            async loadJsonData(){
+                const response = await fetch('http://localhost:8080');
+                this.jsonData = await response.json(); //extract JSON from the http response
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
